@@ -547,7 +547,6 @@ def regionprops(label_image, intensity_image=None, cache=True,
     (22.729879860483141, 81.912285234465827)
 
     """
-
     label_image = np.squeeze(label_image)
 
     if label_image.ndim not in (2, 3):
@@ -620,30 +619,31 @@ def perimeter(image, neighbourhood=4):
     return total_perimeter
 
 
-def _parse_docs():
-    import re
-    import textwrap
+if __debug__:
 
-    doc = regionprops.__doc__
-    matches = re.finditer('\*\*(\w+)\*\* \:.*?\n(.*?)(?=\n    [\*\S]+)',
-                          doc, flags=re.DOTALL)
-    prop_doc = dict((m.group(1), textwrap.dedent(m.group(2))) for m in matches)
+    def _parse_docs():
+        import re
+        import textwrap
 
-    return prop_doc
+        doc = regionprops.__doc__
+        matches = re.finditer('\*\*(\w+)\*\* \:.*?\n(.*?)(?=\n    [\*\S]+)',
+                              doc, flags=re.DOTALL)
+        prop_doc = dict((m.group(1), textwrap.dedent(m.group(2))) for m in matches)
 
-
-def _install_properties_docs():
-    prop_doc = _parse_docs()
-
-    for p in [member for member in dir(_RegionProperties)
-              if not member.startswith('_')]:
-        try:
-            getattr(_RegionProperties, p).__doc__ = prop_doc[p]
-        except AttributeError:
-            # For Python 2.x
-            getattr(_RegionProperties, p).im_func.__doc__ = prop_doc[p]
-
-        setattr(_RegionProperties, p, property(getattr(_RegionProperties, p)))
+        return prop_doc
 
 
-_install_properties_docs()
+    def _install_properties_docs():
+        prop_doc = _parse_docs()
+
+        for p in [member for member in dir(_RegionProperties)
+                  if not member.startswith('_')]:
+            try:
+                getattr(_RegionProperties, p).__doc__ = prop_doc[p]
+            except AttributeError:
+                # For Python 2.x
+                getattr(_RegionProperties, p).im_func.__doc__ = prop_doc[p]
+
+            setattr(_RegionProperties, p, property(getattr(_RegionProperties, p)))
+
+    _install_properties_docs()
