@@ -358,9 +358,7 @@ class _RegionProperties(object):
         return True
 
 
-def regionprops(label_image, intensity_image=None, cache=True,
-                coordinates=None):
-    """Measure properties of labeled image regions.
+_regionprops_doc = """Measure properties of labeled image regions.
 
     Parameters
     ----------
@@ -557,6 +555,10 @@ def regionprops(label_image, intensity_image=None, cache=True,
 
     """
 
+
+def regionprops(label_image, intensity_image=None, cache=True,
+                coordinates=None):
+    __doc__ = _regionprops_doc
     if label_image.ndim not in (2, 3):
         raise TypeError('Only 2-D and 3-D images supported.')
 
@@ -631,7 +633,7 @@ def _parse_docs():
     import re
     import textwrap
 
-    doc = regionprops.__doc__
+    doc = _regionprops_doc
     matches = re.finditer('\*\*(\w+)\*\* \:.*?\n(.*?)(?=\n    [\*\S]+)',
                           doc, flags=re.DOTALL)
     prop_doc = dict((m.group(1), textwrap.dedent(m.group(2))) for m in matches)
@@ -648,4 +650,5 @@ def _install_properties_docs():
         setattr(_RegionProperties, p, property(getattr(_RegionProperties, p)))
 
 
-_install_properties_docs()
+if __debug__:
+    _install_properties_docs()
